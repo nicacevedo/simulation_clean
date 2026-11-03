@@ -23,7 +23,8 @@ DT_H = 1.0                  # time step length [hours]
 HOURS = 24                  # horizon [hours]
 
 # Input: None -> synthetic profile. Later: path to a CSV with columns timestamp_utc,it_kw
-CSV = None
+# Measured day: built by dc_resource_sim/src/data/esif_day.py (NLR ESIF 2023-07-01, UTC)
+CSV = "esif_24h.csv"
 
 
 def load_it_profile(csv_path):
@@ -83,7 +84,9 @@ if __name__ == "__main__":
     # Experiment A: constant load (or the measured CSV profile, once CSV is set)
     profile_a = load_it_profile(CSV)
     check_inputs(profile_a)
-    result_a = summarize("Experiment A: constant load", run_m0_w0(profile_a))
+    name_a = "Experiment A: constant load" if CSV is None else f"Measured IT profile ({CSV})"
+    out_a = run_m0_w0(profile_a)
+    result_a = summarize(name_a, out_a)
 
     if CSV is None:
         # Hand-computed: 1000 kW * 24 h = 24,000 kWh; x1.2 = 28,800; x0.5 L = 12,000 L
@@ -102,3 +105,39 @@ if __name__ == "__main__":
                                 "direct_consumption_l": 12_000, "peak_dc_kw": 1_440})
 
         print("\nAll checks passed.")
+
+    else:
+        # Compare M0 with facility power reconstructed from the dataset's reported PUE
+        # (ref_dc_kw = it_power_kw * pue per sample, then hourly mean). Not an
+        # independent facility meter. W0 water above is illustrative only.
+        ref = pd.read_csv(CSV, usecols=["timestamp_utc", "ref_dc_kw"])
+        ref["timestamp_utc"] = pd.to_datetime(ref["timestamp_utc"], utc=True)
+        ref = ref.sort_values("timestamp_utc").reset_index(drop=True)
+        assert (ref["timestamp_utc"] == out_a["timestamp_utc"]).all()
+
+        ref_kwh = ref["ref_dc_kw"].sum() * DT_H
+        ref_pue = ref_kwh / out_a["it_kwh"].sum()
+        energy_err_pct = 100 * (out_a["dc_kwh"].sum() - ref_kwh) / ref_kwh
+        hourly_mae_kw = (out_a["dc_kw"] - ref["ref_dc_kw"]).abs().mean()
+        print("\n=== M0 vs reference (reported PUE) ===")
+        print(f"reference_dc_kwh: {ref_kwh:,.1f}")
+        print(f"reference_daily_pue: {ref_pue:.4f}  (M0 k = {PUE:.2f})")
+        print(f"m0_daily_energy_error_pct: {energy_err_pct:+.2f}")
+        print(f"m0_hourly_mae_kw: {hourly_mae_kw:,.1f}")
+
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        hours = out_a["timestamp_utc"].dt.hour
+        fig, ax = plt.subplots(figsize=(8, 4))
+        ax.plot(hours, out_a["dc_kw"], color="#2a78d6", lw=2, label=f"M0 (k = {PUE:.2f} x IT)")
+        ax.plot(hours, ref["ref_dc_kw"], color="#eb6834", lw=2, label="Reference (IT x reported PUE)")
+        ax.set_xlabel("Hour (UTC)")
+        ax.set_ylabel("Facility power (kW)")
+        ax.set_title(f"Facility power, {out_a['timestamp_utc'].dt.date.iloc[0]} (NLR ESIF)")
+        ax.grid(alpha=0.3)
+        ax.legend(frameon=False)
+        fig.tight_layout()
+        png = CSV.replace(".csv", ".png")
+        fig.savefig(png, dpi=120)
+        print(f"plot: {png}")
