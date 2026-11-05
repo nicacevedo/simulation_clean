@@ -1,0 +1,6 @@
+case,cop,wet_aux_kw,wet_electricity_kwh,dry_electricity_kwh,wet_evap_l,delta_e_kwh,delta_e_per_l_kwh_per_l,peak_wet_kw,peak_dry_kw,wet_pass_hours,dry_pass_hours,joint_pass_hours,full_day_recommended_feasible,interpretation
+cop_low,2.0,10.0,24690.0,27263.26835,8203.3416,2573.26835,0.31369,1030.0,1242.1998,0,8,0,False,hypothetical / not a fully recommended-envelope-feasible day
+baseline,3.0,10.0,24690.0,26335.51223,8203.3416,1645.51223,0.20059,1030.0,1168.1332,0,8,0,False,hypothetical / not a fully recommended-envelope-feasible day
+cop_high,5.0,10.0,24690.0,25593.30734,8203.3416,903.30734,0.11011,1030.0,1108.87992,0,8,0,False,hypothetical / not a fully recommended-envelope-feasible day
+wet_aux_low,3.0,5.0,24585.0,26335.51223,8203.3416,1750.51223,0.21339,1025.0,1168.1332,0,8,0,False,hypothetical / not a fully recommended-envelope-feasible day
+wet_aux_high,3.0,20.0,24900.0,26335.51223,8203.3416,1435.51223,0.17499,1040.0,1168.1332,0,8,0,False,hypothetical / not a fully recommended-envelope-feasible day

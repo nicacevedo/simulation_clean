@@ -1,0 +1,10 @@
+scenario,date_utc,policy,weather_source,price_source,valid_hours,wet_hours,baseline_evap_l,feed_cap_lph,it_energy_kwh,facility_energy_kwh,cost_usd_day,w2_evap_l_day,peak_feed_lph,solver_status
+dry_control,2023-01-02,no_shift,"NOAA GHCNh USW00093822 Springfield IL (Tdb_C, RH_raw_pct; qc ok)",MISO DA ex-post LMP ILLINOIS.HUB ($/MWh -> $/kWh),24,0,0.0,0.0,24000.0,25130.4,831.7325,0.0,0.0,input
+dry_control,2023-01-02,cost_optimal,"NOAA GHCNh USW00093822 Springfield IL (Tdb_C, RH_raw_pct; qc ok)",MISO DA ex-post LMP ILLINOIS.HUB ($/MWh -> $/kWh),24,0,0.0,0.0,24000.0,25130.4,818.1206,0.0,0.0,optimal
+dry_control,2023-01-02,water_optimal,"NOAA GHCNh USW00093822 Springfield IL (Tdb_C, RH_raw_pct; qc ok)",MISO DA ex-post LMP ILLINOIS.HUB ($/MWh -> $/kWh),24,0,0.0,0.0,24000.0,25130.4,818.1206,0.0,0.0,optimal
+typical_wet,2023-05-28,no_shift,"NOAA GHCNh USW00093822 Springfield IL (Tdb_C, RH_raw_pct; qc ok)",MISO DA ex-post LMP ILLINOIS.HUB ($/MWh -> $/kWh),24,7,1147.8435,269.7244,24000.0,25130.4,486.9748,1147.8435,269.7244,input
+typical_wet,2023-05-28,cost_optimal,"NOAA GHCNh USW00093822 Springfield IL (Tdb_C, RH_raw_pct; qc ok)",MISO DA ex-post LMP ILLINOIS.HUB ($/MWh -> $/kWh),24,7,1147.8435,269.7244,24000.0,25130.4,478.4566,1120.8937,269.7244,optimal
+typical_wet,2023-05-28,water_optimal,"NOAA GHCNh USW00093822 Springfield IL (Tdb_C, RH_raw_pct; qc ok)",MISO DA ex-post LMP ILLINOIS.HUB ($/MWh -> $/kWh),24,7,1147.8435,269.7244,24000.0,25130.4,478.4556,1120.8937,269.7244,optimal
+high_wet,2023-06-25,no_shift,"NOAA GHCNh USW00093822 Springfield IL (Tdb_C, RH_raw_pct; qc ok)",MISO DA ex-post LMP ILLINOIS.HUB ($/MWh -> $/kWh),24,21,8203.3414,818.6332,24000.0,25130.4,646.511,8203.3414,818.6332,input
+high_wet,2023-06-25,cost_optimal,"NOAA GHCNh USW00093822 Springfield IL (Tdb_C, RH_raw_pct; qc ok)",MISO DA ex-post LMP ILLINOIS.HUB ($/MWh -> $/kWh),24,21,8203.3414,818.6332,24000.0,25130.4,629.101,7701.3463,818.6332,optimal
+high_wet,2023-06-25,water_optimal,"NOAA GHCNh USW00093822 Springfield IL (Tdb_C, RH_raw_pct; qc ok)",MISO DA ex-post LMP ILLINOIS.HUB ($/MWh -> $/kWh),24,21,8203.3414,818.6332,24000.0,25130.4,632.0729,7614.0812,753.2675,optimal

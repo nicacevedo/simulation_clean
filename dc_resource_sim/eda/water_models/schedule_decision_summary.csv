@@ -1,0 +1,4 @@
+policy,it_energy_kwh,w2_evaporation_l,saving_vs_no_shift_l,conditional_regret_l,peak_feed_lph
+no_shift,24000.0,8680.498,0.0,221.717,1353.818
+C1_optimal,24000.0,8458.781,221.717,0.0,1451.983
+W2_optimal,24000.0,8458.781,221.717,0.0,1451.983

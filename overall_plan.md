@@ -567,3 +567,268 @@ The central hypothesis to test is:
 This is consistent with our existing EDA and with the literature, but its decision consequences remain to be established by the simulations.
 
 The first objective is not to build the most realistic data-center simulator. It is to produce a reproducible model-sufficiency experiment that identifies, one refinement at a time, which physical relationships actually matter for electricity, heat, water and optimization decisions.
+
+
+---
+
+Updates after step 20:
+
+# Revised research plan — Facility electricity, heat, and water
+
+**Scope:** One facility and one hour first, followed by one 24-hour profile. Preserve completed Steps 00–20. Work through the physical and measurement boundaries before returning to optimization or groundwater planning.
+
+**Immediate priority:** M0 → IT heat → W0 → one cooling architecture → evaporation → supply-water demand. Make one small change at a time, with an explicit check and stopping rule.
+
+## 1. Why this revision is necessary
+
+The original plan, *From M0 to decision-relevant energy–water models*, correctly proposed separate electricity, cooling, water, and optimization layers, and progressive model families M0–M2 and W0–W2. We should **keep that structure**. The later proposed overhaul moved too quickly to water networks and groundwater before we finished understanding the facility-level mappings. We should **defer that overhaul**.
+
+Steps 00–20 answered important preliminary questions, but they do not constitute a calibrated facility electricity–water model. The most useful corrections are:
+
+1. **Do not infer cooling electricity or cooling heat from total PUE alone.** $P^{DC}=kP^{IT}$ gives an aggregate electrical total. It does not identify which parts heat the servers, coolant, building air, or outdoors.
+2. **Do not equate IT heat, chiller cooling load, wet-tower heat rejection, and evaporative cooling duty.** Each crosses a different physical boundary. In particular, a direct-evaporative air system does **not** send IT heat to a cooling tower.
+3. **Do not equate evaporation, cooling-tower makeup, site water intake, billed municipal delivery, water consumption, and groundwater extraction.** They may differ substantially.
+4. **Do not add modeled chiller/fan/pump electricity to an existing total-facility PUE prediction.** That double-counts overhead. Physical cooling electricity replaces the corresponding empirical component, or is used in a separate explicitly component-based model.
+5. **Treat Steps 17–20 as correctly implemented conditional physics examples, not independent validation.** Their parameters were assumptions. A balance closing or an assertion passing does not establish a site's measured water use.
+6. **Treat fitted IT-load slopes as predictive, not automatically causal.** The high-load holdout showed that extrapolating unrestricted $a+bP^{IT}$ can fail even when $b$ is stable across fitted periods.
+
+The original proposal's groundwater, multi-sector allocation, and planning objectives remain longer-term motivations. They do not need to be implemented this week.
+
+## 2. What is already established (do not repeat)
+
+| Evidence | Main result | Status for this plan |
+|---|---|---|
+| Steps 00–04 | M0 energy accounting, ESIF 2023 day/hour checks, daily PUE and overhead variation | Keep as verified baselines |
+| Steps 05–07 | M1-fixed generally generalizes better than unrestricted M1 in the high-load split; summer cooling/pumps explain the extra ~31 kW overhead, with an *accounting* identity | Do not redo EDA; no independent meter validation from the identity |
+| Steps 08–10 | M0/M1-fixed scheduling equivalence without binding facility limits; differences under capacity limits; small real-price regret | Keep optimization code, pause new optimizations |
+| Steps 11–14 | Hourly capacity errors matter; M2a-fixed, $P^{DC}=P^{IT}+a+c(T_{wb}-T_0)$, is the strongest simple predictive candidate across selected tests; one held-out-day decision test has small cost consequences | Keep as empirical evidence; do not use M2a coefficients as cooling equipment parameters |
+| Steps 15–16 | W0 direct water unchanged by constant-energy scheduling; modeled grid-water choice changes schedule but is highly sensitive to time-pattern errors | Close this scenario, do not claim physical water savings |
+| Steps 17–18 | Tower evaporation, blowdown, makeup, chiller condenser heat and latent-ratio scenarios pass balances | Keep for **tower/chiller** archetype only |
+| Step 19 | Psychrometric tower calculation with assumed airflow and saturated leaving air passes; heat fraction is derived, not identified | Keep for **tower** archetype; no calibrated airflow/outlet state |
+| Step 20 | Direct-evaporative air-side model passes dry/wet/infeasible cases and moist-air balances | Keep for **air-side** archetype; no site-specific controls or water treatment |
+| Step 23 | `w0_water_basis.py`: A and B both 24,000 kWh IT → 12,000 L/day; peak modeled rate 500 vs 600 L/h; `water_basis = "onsite_direct_consumption_proxy"` | W0 is a constant *onsite direct-consumption* proxy per kWh of IT electricity. It is invariant to workload timing if total IT energy is fixed. Its hourly output is not a measured intake/makeup flow. It contains no information about cooling architecture, weather, temperature, airflow, treatment losses, or the origin of the water. |
+
+### What the empirical evidence does and does not establish
+
+- ESIF 2023 **does** provide measured or derived electrical operating signals and weather, allowing hourly facility-power model evaluation. PUE-implied overhead reconciling its components is not independent validation if PUE is computed from those same components.
+- Prineville records **do** provide billed monthly water categories. Without synchronized facility IT electricity, operating mode, treatment flows, and meter boundaries, they do not identify hourly evaporation or WUE.
+- The illustrative physical models **do** conserve energy and mass under their assumptions. They do not show that the assumed cooling technology, flow rates, controls or supply-water treatment describe a real facility.
+
+## 3. The physical model: variables and boundaries first
+
+Use **power** (kW) and **heat rate** (kW thermal) within each hour, **electricity and thermal energy** (kWh and kWh thermal) over time, and **water flow** (L/h) or **volume** (L). Set $\Delta t=1$ hour for the first checks; do not confuse numerical equality with physical equality of units.
+
+### A. Electrical meter boundary
+
+$$
+P_t^{DC}=P_t^{IT}+P_t^{nonIT}, \qquad E_t^{DC}=P_t^{DC}\Delta t.
+$$
+
+**M0** is $P_t^{DC}=kP_t^{IT}$, so it identifies only $P_t^{nonIT}=(k-1)P_t^{IT}$. We cannot assign all of this overhead to a chiller or a fan.
+
+**M1-fixed**, **M1**, and **M2a-fixed** remain alternative *empirical predictors* of the same facility meter; their use is not a separate cooling-plant energy source.
+
+### B. IT thermal boundary
+
+For an idealized steady-state server-room experiment,
+
+$$
+\dot Q_t^{IT\rightarrow room}\simeq P_t^{IT}.
+$$
+
+More generally, track heat exported, heat stored, and internal sources explicitly. A useful *accounting identity* is
+
+$$
+\dot Q_t^{IT\rightarrow room}=P_t^{IT}-\dot Q_t^{other\ destinations}-\frac{dU_{IT}}{dt}
+$$
+
+where terms excluded by the simplified model are zero **assumptions**, not measured zeroes. Do not replace the left side by total $P^{DC}$ without locating non-IT heat sources.
+
+### C. Cooling architecture: keep two different branches
+
+**Branch A — Direct evaporative air cooling:** outside air enters a misting/evaporative stage, conditioned supply air absorbs server-room heat, and warm air leaves or recirculates. The air stream carries server heat; **IT heat is not equated to evaporative latent duty**. Use the psychrometric and airflow balances from Step 20.
+
+**Branch B — Water-cooled chiller and cooling tower:** the chiller removes a thermal load; if all compressor input reaches its water-cooled condenser, $\dot Q^{tower}\approx\dot Q^{chiller\ load}+P^{compressor}$. Tower evaporation and blowdown follow Steps 17–19. Other paths (dry rejection, pump heat, storage) are explicit exclusions or separate terms.
+
+Do **not** connect Branch A's humidification directly to Branch B's tower cycles of concentration. These are different systems.
+
+### D. Water accounting boundary
+
+Define and report **separately**:
+
+- $V^{evap}$ — water evaporated by the chosen cooling process (part of onsite consumption).
+- $V^{makeup}$ — process water required to replace losses, e.g. tower evaporation + blowdown (not identical to evaporation).
+- $V^{intake}$ — water delivered/withdrawn across the facility boundary, potentially including treatment reject, other uses and storage changes.
+- $V^{discharge}$ — water leaving to sewer, surface water or other sinks; the destination matters.
+- $V^{consumption}$ — water not returned to the relevant water-resource boundary during the accounting period.
+- $V^{groundwater}$ — source-specific groundwater withdrawals; **not** inferred automatically from municipal supply.
+
+For a clearly specified site boundary and period, use the complete mass balance
+
+$$
+V^{in}+V^{other\ imports}=V^{evap}+V^{discharge}+V^{other\ exports}+\Delta V^{storage}.
+$$
+
+Avoid counting internal recirculation twice. State the return-flow boundary before claiming net consumption.
+
+**W0** is an explicit baseline $V^{direct,con}=w_0E^{IT}$ **only if** $w_0$ is defined on a direct-consumption basis. If the actual data measure intake, use a separately named intake intensity, not the same $w_0$.
+
+### E. An important interpretation check from Steps 18–19
+
+The diagnostic ratio $Q_{latent}/Q_{tower}$ can exceed 1 if sensible heat transfers in the opposite direction; Step 19 found 1.019 in one scenario. Therefore, a "latent fraction" restricted to $[0,1]$ is a convenient **scenario assumption** in Step 18, not a universal physical bound. Report the sensible/latent sign convention rather than clipping a derived value.
+
+## 4. Small-step implementation sequence
+
+**Rule:** One conceptual addition per step. Reuse the verified scripts rather than rewrite them. Every step produces a compact table, assertions where appropriate, and a short statement of what is *measured*, *inferred*, or *assumed*.
+
+### Step 21 — Freeze one reference case and audit its boundaries **(DO THIS NEXT)**
+
+**Question:** Are M0, IT heat, W0, tower evaporation/makeup and direct-air evaporation being compared with consistent definitions?
+
+**Inputs:** A constant 1,000 kW IT load for one hour and 24 hours; $k=1.0471$, $w_0=0.5$ L/kWh IT; Steps 17–20's existing published illustrative assumptions.
+
+**Checks:**
+
+1. $P^{DC}=1047.1$ kW, non-IT electricity $=47.1$ kW. In 24 hours: $E^{IT}=24,000$ kWh, $E^{DC}=25,130.4$ kWh, non-IT $=1,130.4$ kWh.
+2. Idealized IT heat is $1000$ kW thermal, or $24,000$ kWh thermal per day; **do not** call the 47.1 kW overhead "chiller heat" without a component boundary.
+3. W0 direct consumption is $500$ L/h and $12,000$ L/day **by illustrative assumption**.
+4. Under Step 20's *different* direct-air assumptions (30°C, 30% RH), evaporation is approximately $489.4$ L/h. It is not site intake, and numerical similarity to W0 is not calibration.
+5. Under Step 17's *different* tower assumptions, makeup is approximately $1,959.2$ L/h. Do **not** add tower and air results or compare them as if they shared equipment.
+
+**Deliverable:** One compact model-boundary table and a short `boundary_and_units.md` (or append it to the current modeling context); no new physics script is needed. **Stop** when every flow has its proper physical boundary, unit and empirical/assumed status.
+
+### Step 22 — Connect M0 to IT heat, without inventing a cooler
+
+**Question:** What can IT electricity alone tell us about the heat that a particular cooling architecture must handle?
+
+**Action:** Reuse constant and 0.8/1.2 MW IT profiles, and the one-hour/24-hour accounting. Explicitly introduce $f_{room}$, the share of IT electrical energy appearing as heat in the cooling boundary: $Q^{room}=f_{room}E^{IT}$; use $f_{room}=1$ as the initial limiting case. Do not replace this by the tower wet-rejection fraction or a universal equipment coefficient.
+
+**Check:** With equal total IT energy and fixed $f_{room}$, the daily thermal load matches; the peak thermal duty differs. If time-varying heat storage or reuse is not modeled, mark it excluded.
+
+**Deliverable:** A one-hour and one-day heat ledger with assumptions; no model fitting. **Stop** once heat destinations are clear.
+
+### Step 23 — Establish W0 and its **measurement meaning**
+
+**Question:** Is the simple direct-water model predicting evaporation, intake, or total onsite consumption?
+
+**Action:** Keep $V^{direct,con}=w_0E^{IT}$ with $w_0=0.5$ L/kWh IT as an explicit scenario. Show the same total water for both load profiles and different peak water rate; do **not** infer this coefficient from Prineville bills. Add a separate `water_basis` label to the result, not a more complex WUE formula.
+
+**Check:** $\sum_tV_t^{W0}$ is invariant to energy-preserving scheduling. Withdrawal and consumption are never summed together. Report peak L/h separately from total L.
+
+**Deliverable:** Small W0 table and one invariance assertion. **Stop** when the basis is unambiguous.
+
+### Step 24 — Bring in **one** physical water branch: direct evaporative air
+
+**Question:** How does water evaporation arise from *airflow and humidity change*, instead of from an assumed WUE?
+
+**Action:** Reuse Step 20's verified psychrometric functions with the same 1 MW IT case. Reproduce only (i) 20°C/50% RH dry, (ii) 30°C/30% RH wet, (iii) 30°C/70% RH infeasible. Keep the original assumed temperature rise, supply limit and saturation effectiveness. Do not implement mixing, recapture, RO, extra fans or chiller fallback in this step.
+
+**Checks:** Air and water balances, supply saturation check, equipment-effectiveness feasibility, and $V^{evap}=m_{da}\Delta\omega/\rho_w$. A physically infeasible hour is **flagged**, not assigned zero use and called served.
+
+**Deliverable:** Three-row mapping from ambient air + IT heat to airflow, cooling feasibility and evaporation. No new model is required beyond Step 20. **Stop** when the physical explanation, including the limited role of RH at a fixed target supply temperature, is clear.
+
+### Step 25 — Add exactly one supply-water parameter to W2-Air
+
+**Question:** How does evaporation differ from water delivered to the cooling process?
+
+**Action:** Add an explicitly hypothetical treatment yield $\eta$ to **the idealized direct-air branch only**. In the simplest no-recovery/no-other-losses example:
+
+$$
+V^{process\ intake}=V^{evap}/\eta, \qquad V^{treatment\ reject}=V^{process\ intake}-V^{evap}.
+$$
+
+Check $\eta=1$ and $\eta=0.8$. For $489.4$ L/h evaporation, $\eta=0.8$ gives approximately $611.7$ L/h intake and $122.3$ L/h reject. **These are scenario quantities, not Prineville RO measurements.** In a real system, recovery, drain, sanitary use and storage require additional explicit terms.
+
+**Checks:** All values nonnegative; intake = evaporation + reject in this simplified system; a lower yield raises intake without changing process evaporation. Do not call all intake "consumption" or "groundwater".
+
+**Deliverable:** One extra parameter and a two-row comparison. **Stop** before adding recapture, losses or a fitted yield.
+
+### Step 26 — One 24-hour water/heat trajectory (only after Steps 21–25)
+
+**Question:** What changes when weather varies over time, while the equipment assumptions stay fixed?
+
+**Action:** Use one explicitly hypothetical 24-hour set of ambient states or one verified location-matched weather day. Keep IT power at 1 MW and avoid optimizer decisions. Compute hourly M0 electricity, IT thermal duty, W0, W2-Air evaporation, process intake and feasibility, plus daily totals and peak L/h. Do not fill an infeasible hour with zero water: indicate unmet supply-temperature conditions and do **not** claim a feasible complete-day total unless a fallback is specified.
+
+**Checks:** Each feasible hour obeys its balances; 24-hour energy totals reconcile; treatment intake and reject balance; no mixing of site-specific ESIF power coefficients with claims about Prineville operations.
+
+**Deliverable:** One compact 24-row table and summary, with a clear note about any infeasible hours. **Stop** after one day.
+
+### Step 27 — Minimal data-boundary check, not calibration
+
+**Question:** Which components of our outputs are independently observable in the current Prineville records?
+
+**Action:** Reuse the previously drafted Step 21 Prineville meter-ledger instructions, but perform a bounded 2023 meter/category audit **after** the modeling meanings are stable. Preserve municipal delivery, bulk delivery, well-for-sewer, discharge and annual corporate withdrawal boundaries separately. Use the meter-swap history. Do not fit an hourly WUE or treatment yield from monthly totals.
+
+**Deliverable:** A one-page measured/missing-variable matrix and monthly source ledger. **Stop** after unit and date checks, without attempting to force an annual reconciliation.
+
+### Step 28 — Power/cooling coupling, only after we understand each branch
+
+**Question:** If cooling choice changes fan/pump/chiller demand, how can we update facility electricity **without counting it twice**?
+
+**Action:** State two alternatives clearly: (A) use empirical total-facility $P^{DC}=kP^{IT}$ for the accounting baseline and **do not** add explicit cooling electricity; (B) use $P^{DC}=P^{IT}+P^{other}+P^{fan}+P^{pump}+P^{chiller}$ with mutually exclusive components and the correct cooling architecture. Only use (B) for cooling interventions if physical coefficients or transparent ranges are available. Do not transfer ESIF coefficients to Prineville without labeling this a hypothetical template.
+
+**Check:** Component sums match the chosen meter boundary; no term appears twice; if explicit cooling terms are absent, do not claim an electricity–water technology trade-off.
+
+**Deliverable:** One boundary-consistent energy/water comparison, not a new large regression campaign.
+
+### Step 29 — Return to water-sensitive decisions (later)
+
+Only when W0 and at least one W2 branch have traceable, internally consistent inputs, compare (i) fixed load, (ii) cost-optimal load, and (iii) one water-constrained alternative. Hold the power model fixed when testing water complexity. Report feasibility under wet cooling, energy cost, direct consumption, intake/peak supply and any constraint violations. A reference case is a **declared scenario**, not empirical water truth unless synchronized site data exist. Do not resume broader site shifting or groundwater planning within this short sequence.
+
+## 5. Model progression without mixing complexity
+
+| Stage | Electrical model | Heat model | Water model | What can be concluded |
+|---|---|---|---|---|
+| **A — Baseline** | M0 total electricity | $Q^{IT}\simeq E^{IT}$, declared boundary | W0 consumption intensity | Accounting and energy-conservation checks only |
+| **B — Physical water** | **Same M0** | Server-air heat balance **or** chiller/tower heat balance | W2-Air **or** W2-Tower | Conditional evaporation/makeup and cooling feasibility |
+| **C — Water supply** | **Same M0** | Same selected branch | Treatment yield / discharge / storage | Intake versus consumption versus sewer/return flows |
+| **D — Electrical refinement** | Existing fitted M1-fixed or M2a-fixed for *prediction*, or explicit components for *technology comparison* | Same branch, boundaries audited | Same water mapping | Predictive and/or conditional technology differences, not automatic causal effects |
+| **E — Decision value** | Chosen defensible power mapping | Explicit feasibility | W0 versus W2 scenarios | Conditional scheduling implications and model sufficiency |
+
+**Do not jump diagonally in this table.** When a water assumption changes, leave electrical assumptions unchanged; when a power model changes, keep the water model fixed.
+
+## 6. What to do this week
+
+**Minimum successful week (recommended):** complete **Steps 21–23**. This means (i) audit the boundary/units, (ii) explicitly connect M0 to *IT* heat while identifying unknown heat destinations, and (iii) make W0's consumption basis unambiguous.
+
+**If those are clearly resolved:** do **Step 24** by reviewing the already coded W2-Air model as a physical extension. **Only if time remains:** add Step 25's one-parameter supply balance.
+
+Do **not** plan Step 26's weather day, Step 27's meter cleanup, or any new optimization as commitments for this week. They remain next steps conditioned on passing the simpler checks.
+
+### The expected outcome this week
+
+A self-consistent one-site, one-hour/one-day set of statements:
+
+- Given IT electricity, **M0 predicts facility electricity**.
+- Given IT electrical input and an explicitly chosen thermal boundary, we know how much **IT heat** must be handled under the steady-state assumption; we do **not** know its equipment destination automatically.
+- Given $w_0$, **W0 predicts a stated water-accounting category** without claiming cooling physics.
+- Given one air-cooling architecture and its parameters, **W2-Air predicts evaporation and feasibility**, not automatically total site intake.
+- Given a water-treatment yield, a *separate* balance can estimate process intake and reject under transparent assumptions.
+
+If a quantity is unobserved, label it as such. We should prefer a correct, small, partially identified model to a complicated model that appears to predict variables we cannot measure.
+
+## 7. Rules for evidence, implementation, and stopping
+
+1. **Evidence tags:** `measured`, `derived from measured`, `assumed engineering input`, `modeled scenario`, `unidentified`. Record them alongside every principal coefficient and output.
+2. **No architectural leakage:** ESIF electricity coefficients are not Meta/Prineville fan or chiller measurements. Tower and direct-air models never share water-treatment assumptions automatically.
+3. **No compensating fits:** do not tune airflow, efficiency, cooling split, treatment yield or WUE to make unrelated municipal totals appear to match.
+4. **No fake validation:** assertions verify code and physics; independence of the reference data is required for empirical validation.
+5. **No unnecessary scaffolding:** reuse `w2_tower_first.py`, `w2_tower_heat_boundary.py`, `w2_tower_psychrometric.py`, and `w2_air_first.py`. One small change or note per step; do not refactor the repository or create a large run matrix.
+6. **Explicit success criteria:** after each step, report one physical balance, one key number, the most important assumption and the one thing the result does *not* establish.
+7. **No optimization before boundaries:** water-sensitive scheduling resumes only after evaporation, intake and consumption are correctly distinguished.
+
+## 8. Longer-term objectives retained from the original plan
+
+The original S0–S4 experimental structure remains useful but should resume only after the relevant facility models are stable:
+
+- **S0:** M0/W0 accounting and scheduling invariant — already demonstrated.
+- **S1:** power-model decision relevance — already demonstrated under controlled capacity limits.
+- **S2:** water-model decision relevance — grid-water accounting completed as a fragile conditional scenario; **direct W2** still needs physical boundary and measurement review before stronger conclusions.
+- **S3:** wet/dry cooling comparisons — defer until both electricity penalties and water savings are represented without double counting, and all modes satisfy thermal constraints.
+- **S4:** geographic workload shifting — defer until site archetypes and source-water categories are comparable.
+
+Groundwater/source-aware planning and the proposal's agricultural/municipal competition questions remain important **subsequent** research stages, not the next coding task.
+
+## 9. Single immediate instruction
+
+**Next: Step 21 — do not write another full water model.** Produce a one-page energy–heat–water boundary ledger for M0/W0 and the two previously verified cooling architectures using the constant 1 MW case. Correct any mistaken equivalences, mark every assumption, and stop. Only after the ledger is unambiguous should we add the next relationship.

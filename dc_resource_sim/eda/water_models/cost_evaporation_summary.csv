@@ -1,0 +1,5 @@
+policy,it_energy_kwh,facility_energy_kwh,electricity_cost_usd,w2_evaporation_l,saving_vs_no_shift_l,water_saving_vs_cost_opt_l,extra_cost_vs_cost_opt_usd,peak_w2_feed_lph,feed_cap_lph,cap_violation_lph,solver_status
+no_shift,24000.0,25130.4,862.046,8680.498,0.0,-212.414,27.727,1353.818,1353.818,0.0,input
+cost_optimal,24000.0,25130.4,834.319,8468.083,212.414,0.0,0.0,1239.29,1353.818,0.0,optimal
+water_optimal,24000.0,25130.4,839.231,8460.703,219.795,7.381,4.912,1353.818,1353.818,0.0,optimal
+budget_midpoint,24000.0,25130.4,835.188,8464.393,216.105,3.69,0.869,1353.818,1353.818,0.0,optimal

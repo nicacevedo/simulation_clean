@@ -1,0 +1,78 @@
+## Final assessment — Combine both reviews, but keep the presentation minimal
+
+The local agent's assessment is more complete regarding coverage of our experiments. My previous assessment was more appropriate regarding simplicity and avoiding unnecessary figures.
+
+I recommend combining these strengths.
+
+The local agent correctly identifies several important findings missing from the current five-figure summary. However, I would not adopt its proposed six figures plus two tables without modification. That adds complexity without necessarily improving the central research story.
+
+### 1. What I agree with
+
+| Assessment                                                              | My conclusion                                                                                                |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Create a complete findings inventory first                              | Strongly agree. This should be our reference for all subsequent experiments and presentations.               |
+| Show how facility overhead actually behaves                             | Strongly agree. This is one of our most important empirical findings and deserves a figure.                  |
+| Show when the reduced water model fails                                 | Agree. The dependence on airflow and equipment assumptions must be explicit.                                 |
+| Replace F4's WAPE-only plot with the existing seasonal aggregation plot | Agree. The seasonal plot explains why the models differ rather than merely reporting errors.                 |
+| Include Step 30                                                         | Strongly agree. It demonstrates decision sufficiency and the daily-volume versus peak-demand trade-off.      |
+| Create a Prineville reconciliation figure                               | Disagree with its priority. Valuable accounting evidence, but peripheral to our present modeling objectives. |
+| Expand to six figures plus two tables                                   | Not necessary. Five carefully chosen figures are sufficient for the main story.                              |
+
+### 2. My recommended final five figures
+
+| Figure                                            | Scientific message                                                                                    | Action                               |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| 1. Facility overhead versus IT load and season    | Why constant PUE fails and why operating conditions matter                                            | Promote and clean existing plot      |
+| 2. Power-model performance across regimes         | When additional model complexity improves prediction and capacity-risk estimates                      | Keep F1, minor improvements          |
+| 3. Weather-dependent evaporation and feasibility  | Temperature drives modeled evaporation; humidity and equipment limits constrain feasibility           | Reuse existing feasibility map       |
+| 4. Water-model sufficiency across temporal scales | C1 reproduces W2; constant-intensity predictions can fail across weather regimes                      | Use existing Figure 07 instead of F4 |
+| 5. Water-model decision value                     | C1 preserves the W2 evaporation optimum on the tested day, but shifting raises peak water-feed demand | Create from Step 30 results          |
+
+This gives us a stronger scientific narrative:
+
+Electricity
+
+Empirical behavior and prediction
+
+Water
+
+Physics and model reduction
+
+Decisions
+
+Operational consequences
+
+The heat-to-water architecture comparison, airflow-transfer sensitivity, Prineville reconciliation, and grid-water scheduling results should remain available as supporting evidence, but they do not all require main figures.
+
+### 3. Three critical corrections to the local agent's interpretation
+
+First, don't conflate simulation agreement with validation. C1's 0.1–0.2% WAPE establishes an excellent approximation to W2-Air under the tested assumptions. It does not establish accuracy against measured facility water.
+
+Second, the Step 30 result is important but limited. C1 and W2 achieve the same reference-optimal evaporation, with zero conditional regret. That does not necessarily prove identical hourly schedules, since multiple optimal solutions can exist. More importantly, the 2.6% reduction in modeled daily evaporation comes with a 7.3% increase in peak treatment feed.
+
+Third, the Prineville near-reconciliation is not independent validation. The 179.8 ML versus 180 ML agreement is promising, but the city and Meta figures may share underlying measurements. A figure emphasizing the 0.13% difference could give it more evidential weight than warranted.
+
+### 4. What should we do immediately?
+
+Do not modify the figures yet.
+
+First, consolidate the two findings inventories into one `eda/summary/findings.md`, preferably using the local agent's more granular 14-hypothesis structure and the evidence qualifications in my earlier ledger.
+
+Each finding should record the tested question, result, evidence level, limitation, and whether it needs a figure. Correct the README's outdated Step 30 statement and use the verified Step 30 CSV as the numerical source.
+
+Then finalize the five figures above. I would avoid adding unrestricted M1/M2a curves to an already crowded F1; their transfer failures can be recorded in the findings table unless a separate visual comparison is necessary.
+
+## Final recommendation
+
+The local agent is right that our existing visualization summary is incomplete. But we should improve selection, not increase the number of figures.
+
+Our major contributions so far are:
+
+- Understanding and predicting facility electricity under different operating regimes.
+- Establishing physically consistent heat-to-water mappings and feasibility conditions.
+- Showing that a simple temperature-dependent model can reproduce a more detailed physical water model.
+- Demonstrating that predictive accuracy, total resource consumption, peak demand, and optimal decisions are different questions.
+
+The strongest next action is one definitive findings inventory, followed by five carefully selected figures.
+
+That will give us both a reliable record of what we have learned and a concise, coherent scientific story—without adding unnecessary modeling, experiments, or presentation overhead.

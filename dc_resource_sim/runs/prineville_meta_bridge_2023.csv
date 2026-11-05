@@ -1,0 +1,7 @@
+quantity,volume_ml,pct_of_C
+A: DC water categories (consumption month),164.88899770521604,91.60499872512001
+B: bulk/hydrant water (bill date),14.874301494692357,8.263500830384642
+A+B: provisional annual bridge,179.7632991999084,99.86849955550467
+"C: Meta reported withdrawal (rounded, 1 ML)",180.0,100.0
+C-A,15.111002294783958,8.395001274879975
+C-(A+B),0.23670080009160088,0.13150044449533382

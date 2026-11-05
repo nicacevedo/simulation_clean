@@ -1,0 +1,3 @@
+model,wape_hourly_pct,wape_daily_pct,wape_monthly_pct,peak_err_lph,wet_mae_lph
+C0,400.246,334.157,281.596,-2818.157,568.9
+C1,0.191,0.143,0.098,13.801,1.494

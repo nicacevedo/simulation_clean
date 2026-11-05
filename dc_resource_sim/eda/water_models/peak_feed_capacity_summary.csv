@@ -1,0 +1,7 @@
+scenario,model,cap_lph,solver_status,w2_evaporation_l,saving_vs_no_shift_l,realized_w2_peak_feed_lph,peak_violation_lph,w2_feasible,conditional_regret_l
+A_existing_peak,W2,1353.818,optimal,8460.702,219.796,1353.818,0.0,True,0.0
+A_existing_peak,C1,1353.818,optimal,8460.802,219.696,1348.685,0.0,True,0.1
+B_intermediate,W2,1402.901,optimal,8459.741,220.757,1402.901,0.0,True,0.0
+B_intermediate,C1,1402.901,optimal,8459.845,220.653,1397.581,0.0,True,0.104
+C_step30_peak,W2,1451.983,optimal,8458.781,221.717,1451.983,0.0,True,0.0
+C_step30_peak,C1,1451.983,optimal,8458.888,221.61,1446.478,0.0,True,0.108

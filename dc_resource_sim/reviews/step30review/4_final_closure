@@ -1,0 +1,58 @@
+## Final assessment: Strong improvement. Keep the changes, with a few corrections.
+
+I reviewed `eda06.zip`, including the new `findings.md`, updated README, Step 29–30 CSVs, and relevant experiment scripts.
+
+My assessment: the findings inventory is now a solid reference for Steps 00–30. It is more valuable than creating additional figures immediately.
+
+The local agent made the right decision to consolidate the evidence before changing the visualizations.
+
+### 1. What is particularly good
+
+- The 14 findings cover the major experiments. Electricity prediction, cooling physics, water-model simplification, optimization, and measurement boundaries are all represented.
+- Evidence types are distinguished appropriately. The inventory generally separates measured inputs, conditional simulations, optimization scenarios, and billing data.
+- Step 30 is correctly incorporated. The CSV confirms 221.7 L/day lower modeled evaporation, zero C1 regret, and a 7.25% increase in peak treatment feed.
+- The warm-holdout correction is valid. Unrestricted M2a achieves 11.4 kW MAE versus 11.6 kW for M2a-fixed. This small difference matters for reporting the ranking accurately.
+- The planned figures remain separate from completed figures. This avoids prematurely changing a working presentation.
+
+### 2. Four corrections I recommend
+
+| Priority | Issue                                                                                | Required correction                                                                                                                                                 |
+| -------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| High     | README still says M2a-fixed has the lowest MAE in both holdouts                      | Say best among the three plotted models. Unrestricted M2a is slightly better on the warm holdout.                                                                   |
+| High     | Finding 10 compares W0, W2 evaporation, and peak treatment feed numerically          | Explicitly state that these represent different water boundaries. Similar totals and the 2.44× peak ratio are illustrative, not like-for-like physical comparisons. |
+| Medium   | Finding 10 describes one week as 12% of annual evaporation                           | Say 12% of modeled evaporation across the 7,990 valid 2023 hours. The missing 770 hours prevent a complete-year claim.                                              |
+| Medium   | Finding 5 says power-model choice changes decisions only when a facility limit binds | Restrict this conclusion to the tested optimization formulations. Other objectives or operating constraints can also make model choice relevant.                    |
+
+I would also preserve two provenance warnings: the seasonal overhead decomposition should be checked against its original Step 07 output before publication, and F5's three scheduling points should ideally be regenerated from Step 15 rather than maintained as manually transcribed values.
+
+Neither requires repeating the experiments now.
+
+### 3. Is the final five-figure plan still appropriate?
+
+Yes. I would keep the selected five figures unchanged in scope.
+
+| Figure                         | Why it matters                                                        |
+| ------------------------------ | --------------------------------------------------------------------- |
+| 1. Facility overhead behavior  | Establishes the empirical motivation for better electricity models    |
+| 2. Power-model transfer        | Connects predictive accuracy with operating-regime and capacity risks |
+| 3. Evaporation and feasibility | Establishes the essential cooling physics                             |
+| 4. Water-model aggregation     | Demonstrates when the reduced model is sufficient                     |
+| 5. Step 30 decision value      | Connects model complexity to optimization and peak water requirements |
+
+The Prineville reconciliation, cooling-tower relationships, airflow sensitivity, and grid-water cost trade-off should remain in the supporting results.
+
+One particularly valuable distinction for the final narrative is that Step 30's zero regret demonstrates decision equivalence under one fixed scenario, not general equivalence between C1 and W2. The inventory handles this correctly.
+
+### 4. What I recommend next
+
+Make the four small textual corrections, then finalize the five figures without rerunning the underlying experiments.
+
+The findings inventory should serve as the stable scientific reference; the figures should communicate its most decision-relevant conclusions.
+
+The central research conclusion is now clear:
+
+> Additional model complexity is valuable when it changes prediction under relevant conditions, physical feasibility, or optimization decisions. A simpler model may be sufficient for aggregate water estimates, yet omit essential information about cooling feasibility and peak resource demand.
+
+This is a defensible foundation for the next phase of the project.
+
+Bottom line: Approve the local agent's work, correct the four statements above, and proceed to the final five-figure selection. No new EDA or modeling is justified by this review alone.

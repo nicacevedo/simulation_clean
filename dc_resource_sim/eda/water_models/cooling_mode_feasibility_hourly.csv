@@ -1,0 +1,25 @@
+hour_utc,tdb_c,rh_pct,w2_mode,t_supply_c,outdoor_dp_c,wet_supply_rh_pct,wet_supply_dp_c,wet_recommended_pass,wet_fail_reason,dry_supply_rh_pct,dry_supply_dp_c,dry_recommended_pass,dry_fail_reason
+2023-06-25T00:00Z,30.6,43.0,wet,25.0,16.6017,71.2867,19.441,False,dew point too high;RH too high,59.6355,16.6017,False,dew point too high
+2023-06-25T01:00Z,30.0,46.0,wet,25.0,17.1228,72.0402,19.6102,False,dew point too high;RH too high,61.6389,17.1228,False,dew point too high
+2023-06-25T02:00Z,29.4,50.0,wet,25.0,17.8966,73.8725,20.0153,False,dew point too high;RH too high,64.7235,17.8966,False,dew point too high
+2023-06-25T03:00Z,29.4,50.0,wet,25.0,17.8966,73.8725,20.0153,False,dew point too high;RH too high,64.7235,17.8966,False,dew point too high
+2023-06-25T04:00Z,28.9,51.0,wet,25.0,17.752,72.2501,19.6571,False,dew point too high;RH too high,64.1367,17.752,False,dew point too high
+2023-06-25T05:00Z,27.2,61.0,wet,25.0,19.0277,74.0508,20.0543,False,dew point too high;RH too high,69.4755,19.0277,False,dew point too high
+2023-06-25T06:00Z,26.1,65.0,wet,25.0,19.0073,71.6767,19.5287,False,dew point too high;RH too high,69.3873,19.0073,False,dew point too high
+2023-06-25T07:00Z,26.1,67.0,wet,25.0,19.4941,73.8103,20.0017,False,dew point too high;RH too high,71.5223,19.4941,False,dew point too high;RH too high
+2023-06-25T08:00Z,25.6,74.0,wet,25.0,20.6212,77.9357,20.8831,False,dew point too high;RH too high,76.689,20.6212,False,dew point too high;RH too high
+2023-06-25T09:00Z,24.4,79.0,dry,24.4,20.5212,79.0,20.5212,False,dew point too high;RH too high,79.0,20.5212,False,dew point too high;RH too high
+2023-06-25T10:00Z,22.2,84.0,dry,22.2,19.3671,84.0,19.3671,False,dew point too high;RH too high,84.0,19.3671,False,dew point too high;RH too high
+2023-06-25T11:00Z,23.9,82.0,dry,23.9,20.6391,82.0,20.6391,False,dew point too high;RH too high,82.0,20.6391,False,dew point too high;RH too high
+2023-06-25T12:00Z,27.2,69.0,wet,25.0,21.0185,83.151,21.9406,False,dew point too high;RH too high,78.5871,21.0185,False,dew point too high;RH too high
+2023-06-25T13:00Z,27.8,65.0,wet,25.0,20.6186,82.4865,21.8092,False,dew point too high;RH too high,76.6771,20.6186,False,dew point too high;RH too high
+2023-06-25T14:00Z,28.3,53.0,wet,25.0,17.8097,71.2378,19.4299,False,dew point too high;RH too high,64.3703,17.8097,False,dew point too high
+2023-06-25T15:00Z,29.4,43.0,wet,25.0,15.5211,64.8338,17.9237,False,dew point too high,55.6622,15.5211,False,dew point too high
+2023-06-25T16:00Z,30.0,40.0,wet,25.0,14.933,64.023,17.7238,False,dew point too high,53.599,14.933,True,
+2023-06-25T17:00Z,30.6,37.0,wet,25.0,14.258,62.9917,17.4663,False,dew point too high,51.3143,14.258,True,
+2023-06-25T18:00Z,31.1,31.0,wet,25.0,11.9851,56.9785,15.8864,False,dew point too high,44.2382,11.9851,True,
+2023-06-25T19:00Z,31.7,30.0,wet,25.0,12.0053,58.2849,16.2417,False,dew point too high,44.2973,12.0053,True,
+2023-06-25T20:00Z,31.1,35.0,wet,25.0,13.8411,62.667,17.3844,False,dew point too high,49.9464,13.8411,True,
+2023-06-25T21:00Z,30.6,36.0,wet,25.0,13.8352,61.6092,17.1152,False,dew point too high,49.9274,13.8352,True,
+2023-06-25T22:00Z,29.4,37.0,wet,25.0,13.1968,57.0863,15.916,False,dew point too high,47.8954,13.1968,True,
+2023-06-25T23:00Z,28.3,40.0,wet,25.0,13.4149,55.4783,15.4695,False,dew point too high,48.5813,13.4149,True,

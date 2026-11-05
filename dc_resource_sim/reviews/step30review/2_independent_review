@@ -1,0 +1,65 @@
+I've read all of it: the 4 EDA context notes, the 3 results notes, both CSVs, all 12 figures (10 in `eda/`, 2 in `runs/`) and steps 00–30. Below is the review, with no changes made to any file.
+
+## Short answers
+
+- **Are the current figures enough?** No. The 5-figure summary covers about 6 of the 14 major findings, almost all from the simulated-water side. It leaves out how overhead power actually behaves, whether the power models change decisions, the Prineville check (the project's only measured water evidence), and the Step 30 result.
+- **Should we list the findings first?** Yes. The figure set was chosen from a plan written before Steps 29–30 had results, and that is why the gaps and a stale claim got in. A one-page list of findings makes coverage checkable: each figure should prove exactly one row of it.
+- **Two documentation errors to fix:**
+  - `eda/summary/README.md:40` says "Step 30 has not been run". It has: `schedule_decision_compare.py` and `schedule_decision_summary.csv` were written at 17:31, before the README at 17:50. `visualizations01.md` repeats the same claim.
+  - Step 30's results are written up nowhere; they exist only in a CSV. Step 29's appear only inside the README's F4 entry.
+
+## Draft list of findings (steps 00–30)
+
+| #   | Steps         | Question tested                               | Result                                                                                                                                                                                                                             | Evidence                           | Figure today                         |
+| --- | ------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | ------------------------------------ |
+| 1   | 00–03         | Does one constant PUE (M0) transfer?          | Fitting k matters (Dec MAE 443 → 65 kW). k changes by season (1.047 Jul, 1.021 Dec). A +2.6% facility-power error hid a +126% overhead error                                                                                       | Measured IT, PUE-implied reference | none                                 |
+| 2   | 04–07         | Is overhead proportional to IT load?          | No. Overhead is about flat in IT load (the −0.79 PUE–IT correlation is a ratio artifact) and rises about 31 kW in summer from cooling and pumps                                                                                    | Measured                           | `runs/m0_overhead.png` (not curated) |
+| 3   | 05–06, 12–14  | Which power model transfers to new regimes?   | M2a-fixed is best on both holdouts (MAE 11.6 / 9.2 kW). Letting the IT slope be fitted hurts at high load (M1 64.7, M2a 27.5 kW). M0 overpredicts high load by 85 kW                                                               | Measured                           | F1 (without M1/M2a)                  |
+| 4   | 11            | Do small daily errors hide hourly risk?       | Yes. M1-fixed underpredicted 94% of summer hours, and 77% exceeded its training h95                                                                                                                                                | Measured                           | partly F1                            |
+| 5   | 08–10, 14     | Does the power-model choice change decisions? | Only when a facility limit binds. Then M0 gives a 16.9 kW counterfactual violation and M1-fixed $30.77 of unnecessary cost. With real prices: under $1.25/day                                                                      | Simulated decision                 | **none**                             |
+| 6   | 15–16         | Does water-aware scheduling change decisions? | W0 direct water does not change with the schedule. The grid-water-optimal schedule saves 122.5 L/day (0.2%) for +$31.23, and the ranking reverses at a ±0.0239 L/kWh factor error                                                  | Accounting scenario                | F5                                   |
+| 7   | 17–19         | Tower water from heat rejection               | Water balances close. The latent share is an assumption. Two inlets with about the same wet-bulb give different evaporation. Can't be identified without airflow data, so this branch is closed                                    | Conditional physics                | Fig 02B (simple version only)        |
+| 8   | 20, 24, EDA01 | What drives direct-air evaporation?           | Dry-bulb sets the intensity (about 0.098 L/kWh IT per °C above 25 °C). RH mostly decides feasibility (108 of 357 grid states infeasible). Holds for this controller only                                                           | Conditional physics                | Fig 01                               |
+| 9   | 21–23, 25     | Are the water quantities interchangeable?     | No. W0 proxy, evaporation, feed (= evap/η), tower makeup and withdrawal are different boundaries. η changes feed, not evaporation                                                                                                  | Definitions                        | partly Figs 02–03                    |
+| 10  | 26, EDA03     | Do daily volumes describe water demand?       | No. Daily totals within 2.4%, yet W2 is zero for 8 h and its peak feed is 2.4× the W0 rate. On ESIF 2023 weather: 10% of hours wet, 0 infeasible but a thin margin (ε 0.765 vs 0.80 limit), and one week holds 12% of annual water | Simulation on measured weather     | Figs 03, 06                          |
+| 11  | EDA02, 29     | How simple can the water model be?            | C1 reproduces W2: held-out MAE 3.4 L/h, 2023 WAPE 0.19/0.14/0.10% (hour/day/month). The frozen constant model C0 errs 400/334/282% and puts water in winter                                                                        | Surrogate of the simulator         | Figs 04, 07, F4                      |
+| 12  | EDA02         | When does C1 fail?                            | When operating controls change: ΔT_server of 10–20 °C moves evaporation by +50% to −25%. The analytical β·15/ΔT correction fixes it. C1 cannot flag infeasible states                                                              | Surrogate                          | Fig 05 (not in the summary)          |
+| 13  | 27–28         | What do the Prineville meters measure?        | City data-center water (164.9 ML) + bulk/hydrant (14.9 ML) = 179.8 ML, vs Meta's reported 180 ML withdrawal (0.13% gap; 8.4% without bulk). Annual withdrawal only                                                                 | **Measured**                       | **none**                             |
+| 14  | 30            | Does C1 keep the water-optimal decision?      | Yes. It picks the same schedule as W2 (zero regret) and saves 2.6% of evaporation, but peak feed rises 7.3% (1,354 → 1,452 L/h). Constant-intensity models cannot rank hours at all                                                | Simulated decision                 | **none**                             |
+
+## Figure-by-figure review
+
+| Figure                              | Verdict                     | Reason                                                                                                                                                                                          |
+| ----------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| water 01 feasibility map            | **Keep (main)**             | The best figure. One image carries #8, and it correctly separates infeasible (N/A) from zero                                                                                                    |
+| water 02 heat→water by architecture | Move to appendix            | The lines are straight by construction, so it shows model assumptions rather than a finding. #9 reads better as a table. The W0 dashed line hides under the 30/30 line and their labels collide |
+| water 03 constructed day            | Move to appendix            | Replaced by 06, which uses real weather; its one insight fits in a sentence                                                                                                                     |
+| water 04 surrogate fit              | Supporting                  | Clean, and it is where β comes from; 07 communicates the result better                                                                                                                          |
+| water 05 airflow transfer           | **Promote**                 | The only figure showing where C1 breaks. Without it, F4 overstates C1                                                                                                                           |
+| water 06 real-weather week          | Supporting                  | Shows water concentrated on hot afternoons. Doesn't plot IT load, which also drives the peak                                                                                                    |
+| water 07 monthly aggregation        | **Promote, replacing F4**   | Panel A shows *why* C0 fails (wrong seasonal shape), which says more than F4's six WAPE numbers                                                                                                 |
+| F1 power transfer                   | Keep, revise                | Correct and clean, but leaves out unrestricted M1/M2a, the evidence for #3. The right-panel ranking rests on 2–17 hours, so show counts. The title "depends on regime" is vague                 |
+| F4 WAPE log chart                   | Replace with 07A or a table | Six numbers, and the log scale emphasizes a comparison against C0, which was frozen on a synthetic grid rather than fitted to 2023                                                              |
+| F5 cost vs grid-water               | Turn into a table row       | It shows the weakest decision result as the only decision figure, while #5 and #14 are missing                                                                                                  |
+| `runs/m0_overhead.png`              | Promote after cleanup       | The most explanatory measured-data plot (#2). It needs season colors and M1-fixed/M2a lines                                                                                                     |
+| `runs/esif_24h.png`                 | Retire                      | Step 01 sanity check with the uncalibrated k = 1.20                                                                                                                                             |
+
+Also, two numbering schemes collide: "Figure 04" means the surrogate fit in one folder and the aggregation chart in the other. The final set should use one numbering.
+
+## Recommended set (after the list is agreed)
+
+Six figures, only one of them new, plus two tables:
+
+1. Overhead vs IT load by season (cleaned `m0_overhead`) — #1–2
+2. F1 with M1/M2a added and hour counts shown — #3–4
+3. Feasibility map (water 01) — #8
+4. Monthly aggregation (water 07A), with WAPE and peak numbers in the caption — #10–11
+5. Airflow transfer (water 05) — #12
+6. **New:** Prineville bridge, one stacked bar of 164.9 + 14.9 ML against 180 ML — #13
+
+- **Table A:** water boundaries — #9
+- **Table B:** decision-value experiments (power limit, grid water, Step 30), each with effect size and robustness — #5, #6, #14
+
+If five figures is a hard cap, fold figure 1 into F1 as a left panel.
+
+The current figures label evidence type well (measured, simulated or accounting scenario) in their subtitles; the revised set should keep that. If you agree, the next step is saving the list above as `eda/summary/findings.md` and fixing the README's Step 30 line, before touching any figure.

@@ -24,7 +24,7 @@ HOURS = 24                  # horizon [hours]
 
 # Input: None -> synthetic profile. Later: path to a CSV with columns timestamp_utc,it_kw
 # Measured day: built by dc_resource_sim/src/data/esif_day.py (NLR ESIF 2023-07-01, UTC)
-CSV = "esif_24h.csv"
+CSV = "dc_resource_sim/runs/esif_24h.csv"
 
 
 def load_it_profile(csv_path):

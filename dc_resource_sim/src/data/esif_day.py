@@ -16,7 +16,7 @@ import pandas as pd
 PARQUET = ("/home/nacevedo/RA/data-center-externalities-modeling/other_sources/"
            "nlr_esif_fullstack/data_raw/esif_pue/esif.influx.buildingData.PUE.combined.parquet")
 DAY = sys.argv[1] if len(sys.argv) > 1 else "2023-07-01"
-OUT = "esif_24h.csv"
+OUT = "dc_resource_sim/runs/esif_24h.csv"
 # Samples are ~1 min apart with jitter, so an exact grid check is impossible.
 # A day counts as complete if no gap (including from midnight to the first sample
 # and from the last sample to midnight) exceeds this. Gaps are never filled.
